@@ -26,7 +26,8 @@ jobs:
       - name: Install Inno Setup
         run: ./installer.exe /verysilent /allusers /dir=inst
       - name: Create installer
-        run: "%programfiles(x86)%\Inno Setup 6\iscc.exe" ".\windows\installer.iss"
+        run: |
+          "%programfiles(x86)%\Inno Setup 6\iscc.exe" ".\windows\installer.iss"
         shell: cmd
       - name: Create release
         uses: actions/create-release@v1
