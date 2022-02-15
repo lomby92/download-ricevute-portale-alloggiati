@@ -1,0 +1,48 @@
+name: Release
+
+env:
+  INNO_VERSION: 6.2.0
+  RELEASE_VERSION: 0.0.1
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Enable Windows platform
+        run: flutter config --enable-windows-desktop
+      - name: Build for Windows
+        run: flutter build windows
+      - name: Download Inno Setup installer
+        run: curl -L -o installer.exe http://files.jrsoftware.org/is/6/innosetup-${{ env.INNO_VERSION }}.exe
+      - name: Install Inno Setup
+        run: ./installer.exe /verysilent /allusers /dir=inst
+      - name: Create installer
+        run: "%programfiles(x86)%\Inno Setup 6\iscc.exe" ".\windows\installer.iss"
+      - name: Create release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ env.RELEASE_VERSION }}
+          tag_name: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Upload Windows installer
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/windows/runner/Release/DoRPA_installer.exe
+          asset_name: DoRPA_installer.exe
+          asset_content_type: application/vnd.microsoft.portable-executable

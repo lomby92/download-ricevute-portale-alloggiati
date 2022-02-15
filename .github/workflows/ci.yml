@@ -1,0 +1,21 @@
+name: Continuous Integration
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Enable Windows platform
+        run: flutter config --enable-windows-desktop
+      - name: Build for Windows
+        run: flutter build windows
