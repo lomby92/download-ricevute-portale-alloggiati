@@ -12,7 +12,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     var wskey = context.select<CredentialsModel, String?>(
         (credentials) => credentials.getWskey());
@@ -44,7 +44,7 @@ class LoginPage extends StatelessWidget {
           margin: const EdgeInsets.all(20.0),
           padding: const EdgeInsets.all(30.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -136,16 +136,22 @@ class LoginPage extends StatelessWidget {
                 ),
                 Center(
                   child: ElevatedButton(
-                    child: const Text('Login'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(20.0),
                     ),
+                    child: const Text('Login'),
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
+                      if (formKey.currentState!.validate()) {
                         // Save the form to have the updated password value
-                        _formKey.currentState!.save();
+                        formKey.currentState!.save();
 
-                        _login(context, wskey, username, password);
+                        _login(
+                          context,
+                          Navigator.of(context),
+                          wskey,
+                          username,
+                          password,
+                        );
                       }
                     },
                   ),
@@ -158,7 +164,13 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  void _login(BuildContext context, wskey, username, password) async {
+  void _login(
+    BuildContext context,
+    NavigatorState navigator,
+    wskey,
+    username,
+    password,
+  ) async {
     var credentials = context.read<CredentialsModel>();
 
     // Store credentials
@@ -174,7 +186,7 @@ class LoginPage extends StatelessWidget {
       credentials.token = token;
 
       // Go to download page
-      Navigator.pushReplacementNamed(context, DownloadPage.routeName);
+      navigator.pushReplacementNamed(DownloadPage.routeName);
     } on AuthenticationFailureException catch (authenticationFailure) {
       showDialog(
         context: context,

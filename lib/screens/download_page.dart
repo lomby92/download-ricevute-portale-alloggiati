@@ -26,7 +26,7 @@ class DownloadPage extends StatelessWidget {
     var token = context
         .select<CredentialsModel, String>((credentials) => credentials.token!);
 
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     DateTime? date;
 
@@ -55,7 +55,7 @@ class DownloadPage extends StatelessWidget {
           margin: const EdgeInsets.all(20.0),
           padding: const EdgeInsets.all(30.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -89,13 +89,13 @@ class DownloadPage extends StatelessWidget {
                 ),
                 Center(
                   child: ElevatedButton(
-                    child: const Text('Download'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(20.0),
                     ),
+                    child: const Text('Download'),
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
+                      if (formKey.currentState!.validate()) {
+                        formKey.currentState!.save();
                         _download(context, date!, username, token);
                       }
                     },
